@@ -124,7 +124,9 @@ class SendHanlder(tornado.web.RequestHandler):
                           mail_ssl=True if config_info.get(const.EMAIL_USE_SSL) == '1' else False)
             ### 如果没有redis没有配置
             if not emails_list:
-                sm.send_mail(configs.get('default_email'), alert_name, alerts_data['annotations']['detail'])
+                # print(configs.get('default_email'))[0]  #元祖类型
+                sm.send_mail(configs.get('default_email')[0], alert_name, alerts_data['annotations']['detail'])
+                # print('msg=',alerts_data['annotations']['detail'])
                 return self.write(dict(code=-1, msg="没有匹配到规则"))
 
             ### 默认发送邮件

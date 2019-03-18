@@ -36,8 +36,8 @@ EMAIL_USE_SSL = '1',  # redis取出来 1：表示True
 EMAIL_PORT = 465,
 
 sign_name = 'ShineZone',
-template_code = 'SMS_13504423121512',
-default_email = '191715030@qq.com',
+template_code = 'SMS_13523421044115',
+default_email = '1923671815@qq.com',
 try:
     from local_settings import *
 except:
