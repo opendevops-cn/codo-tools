@@ -1,0 +1,9 @@
+tornado_alert:
+  restart: unless-stopped
+  image: tornado_alert:latest
+  volumes:
+    - /var/log/supervisor/:/var/log/supervisor/
+    - /sys/fs/cgroup:/sys/fs/cgroup
+  ports:
+    - "5000:5000"
+  hostname: tornado_alert
