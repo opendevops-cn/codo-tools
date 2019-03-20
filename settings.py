@@ -18,7 +18,7 @@ template_path = os.path.join(os.path.dirname(__file__), "templates"),
 DEFAULT_DB_DBHOST = os.getenv('DEFAULT_DB_DBHOST', '172.16.0.223')
 DEFAULT_DB_DBPORT = os.getenv('DEFAULT_DB_DBPORT', '3306')
 DEFAULT_DB_DBUSER = os.getenv('DEFAULT_DB_DBUSER', 'root')
-DEFAULT_DB_DBPWD = os.getenv('DEFAULT_DB_DBPWD', 'password')
+DEFAULT_DB_DBPWD = os.getenv('DEFAULT_DB_DBPWD', 'ljXrcyn7chaBU4F')
 DEFAULT_DB_DBNAME = os.getenv('DEFAULT_DB_DBNAME', 'codo_tools')
 
 DEFAULT_REDIS_HOST = os.getenv('DEFAULT_REDIS_HOST', '172.16.0.223')
@@ -28,16 +28,17 @@ DEFAULT_REDIS_AUTH = True
 DEFAULT_REDIS_CHARSET = 'utf-8'
 DEFAULT_REDIS_PASSWORD = os.getenv('DEFAULT_REDIS_PASSWORD', '123456')
 
-EMAIL_HOST_USER = 'user@domain.com',
-EMAIL_HOST_PASSWORD = 'password',
-EMAIL_SUBJECT_PREFIX = 'exmail.qq.com',
-EMAIL_HOST = 'smtp.exmail.qq.com',
-EMAIL_USE_SSL = '1',  # redis取出来 1：表示True
-EMAIL_PORT = 465,
+#密码在本地codo-tools-env.sh, source codo-tools-env.sh
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'user@domain.com'),
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'password'),
+EMAIL_SUBJECT_PREFIX = os.getenv('EMAIL_SUBJECT_PREFIX', 'exmail.qq.com'),
+EMAIL_HOST = os.getenv('EMAIL_HOST','smtp.exmail.qq.com'),
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '1'),  # redis取出来 1：表示True
+EMAIL_PORT = os.getenv('EMAIL_PORT',465),
 
 sign_name = 'ShineZone',
-template_code = 'SMS_13523421044115',
-default_email = '1923671815@qq.com',
+template_code = 'SMS_135044115',
+default_email = '191715030@qq.com',
 try:
     from local_settings import *
 except:

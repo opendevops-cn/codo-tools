@@ -7,7 +7,10 @@ Date    : 2018/12/24
 Desc    : 
 """
 
-from models.alert import Base
+from models.alert import Base as alert_base
+from models.fault_mg import Base as falut_base
+from models.project_mg import Base as project_base
+from models.event_record import Base as event_record_base
 from websdk.consts import const
 from settings import settings as app_settings
 # ORM创建表结构
@@ -24,12 +27,18 @@ engine = create_engine('mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8' % (
 
 
 def create():
-    Base.metadata.create_all(engine)
+    alert_base.metadata.create_all(engine)
+    falut_base.metadata.create_all(engine)
+    project_base.metadata.create_all(engine)
+    event_record_base.metadata.create_all(engine)
     print('[Success] 表结构创建成功!')
 
 
 def drop():
-    Base.metadata.drop_all(engine)
+    alert_base.metadata.drop_all(engine)
+    falut_base.metadata.drop_all(engine)
+    project_base.metadata.drop_all(engine)
+    event_record_base.metadata.drop_all(engine)
 
 
 if __name__ == '__main__':

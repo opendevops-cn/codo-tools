@@ -18,7 +18,9 @@ class MyProgram(MainProgram):
     def __init__(self, service='mg_api', progressid=''):
         self.__app = None
         settings = app_settings
-        if service == 'alert':
+        if service == 'tools':
+            self.__app = MyApp(**settings)
+        elif service == 'alert':
             self.__app = MyApp(**settings)
         super(MyProgram, self).__init__(progressid)
         self.__app.start_server()

@@ -1,25 +1,26 @@
-### Tornado Alert告警逻辑
+### 运维工具
 
 #### 部署文档
 
 **创建数据库**
 ```
-create database `tornado_alert` default character set utf8mb4 collate utf8mb4_unicode_ci;
+create database `codo_tools` default character set utf8mb4 collate utf8mb4_unicode_ci;
 ```
 **修改配置**
 - 修改`settings.py`配置信息
 
 **初始化数据**
 ```
-python3 database.py
+python3 db_sync.py
 ```
 
 **启动**
 ```
-python3 startup.py --service=alert --port=8040
+# sh run.sh
+python3 startup.py --service=tools --port=8040
 ```
 
-#### 使用
+#### Prometheus Alert报警
 - POST/PUT/DELETE示例
 ```
 {
@@ -105,19 +106,203 @@ python3 startup.py --service=alert --port=8040
 
 ```
 
-- 表结构
+#### 故障管理
+
+- GET
 ```
-#表结构说明
-username: 用户名，从自动化运维平台获取用户联系信息，如：SMS EMAIL Wechat等等
-keyword：关键字，也就是AlertName,进行关联用户，然后进行报警
-+-----------+--------------+------+-----+-------------------+-----------------------------+
-| Field     | Type         | Null | Key | Default           | Extra                       |
-+-----------+--------------+------+-----+-------------------+-----------------------------+
-| id        | int(11)      | NO   | PRI | NULL              | auto_increment              |
-| username  | varchar(100) | NO   |     | NULL              |                             |
-| keyword   | varchar(100) | NO   |     | NULL              |                             |
-| create_at | datetime     | NO   |     | NULL              |                             |
-| update_at | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
-+-----------+--------------+------+-----+-------------------+-----------------------------+
+http://172.16.0.101:8040/v1/tools/fault/
+```
+- POST
+```
+{
+	"fault_name": "故障名称",
+	"fault_level": "一级故障",
+	"fault_state": "关闭",
+	"fault_penson": "杨红飞",
+	"processing_penson": "处理人员",
+	"fault_report": "https://opendevops.cn/fault_report/test0011.html",
+	"fault_duration": "30分钟",
+	"fault_start_time": "2018-11-22",
+	"fault_end_time": "2018-11-23",
+	"fault_issue": "AWS底层重test启",
+	"fault_summary": "故障总结"
+}
+```
+- PATCH
+```
+{
+    "id": 1,
+	"fault_name": "故障名称",
+	"fault_level": "一级故障",
+	"fault_state": "关闭",
+	"fault_penson": "杨红飞",
+	"processing_penson": "处理人员",
+	"fault_report": "https://opendevops.cn/fault_report/test0011.html",
+	"fault_duration": "30分钟",
+	"fault_start_time": "2018-11-22",
+	"fault_end_time": "2018-11-23",
+	"fault_issue": "AWS底层重test启",
+	"fault_summary": "故障总结"
+}
+```
+- DELETE
+```
+#根据ID删除
+{
+	"id": 2
+}
 ```
 
+#### 项目管理
+- GET
+```
+http://172.16.0.101:8040/v1/tools/project/
+```
+- POST
+```
+{
+    "project_name": "拇指滑雪",
+    "project_status": "进行中",
+    "project_requester": "test",
+    "project_processing": "杨红飞",
+    "project_start_time": "2019-03-18",
+    "project_end_time": "2019-03-20"
+}
+```
+
+- PATCH
+```
+        {
+            "id": 1,
+            "project_name": "拇指滑雪02",
+            "project_status": "进行中",
+            "project_requester": "test02",
+            "project_processing": "杨红飞02",
+            "project_start_time": "2019-03-18 00:00:00",
+            "project_end_time": "2019-03-20 00:00:00",
+            "create_at": "2019-03-20 17:46:57",
+            "update_at": "2019-03-20 17:46:57"
+        }
+```
+- DELETE
+```
+{
+	"id": 1
+}
+```
+
+#### 事件管理
+
+- GET
+
+```
+http://172.16.0.101:8040/v1/tools/event_record/
+```
+
+- POST
+```
+{
+        "event_name": "挖矿病毒入侵2",
+        "event_status": "关闭",
+        "event_level": "高危",
+        "event_processing": "杨红飞，智仁勇男",
+        "event_start_time": "2018-11-22",
+        "event_end_time": "2018-11-22"
+}
+```
+
+- PATCH
+```
+        {
+         "id": 1,
+        "event_name": "挖矿病毒入侵update",
+        "event_status": "关闭",
+        "event_level": "高危",
+        "event_processing": "杨红飞，智仁勇男",
+        "event_start_time": "2018-11-22",
+        "event_end_time": "2018-11-22"
+        }
+```
+- DELETE
+```
+{
+	"id": 1
+}
+```
+
+
+
+### 表结构
+
+- Promethes Alert报警
+```
+username: 用户名，从自动化运维平台获取用户联系信息，如：SMS EMAIL Wechat等等
+keyword：关键字，也就是AlertName,进行关联用户，然后进行报警
++-------------+--------------+------+-----+-------------------+-----------------------------+
+| Field       | Type         | Null | Key | Default           | Extra                       |
++-------------+--------------+------+-----+-------------------+-----------------------------+
+| id          | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| nicknames   | varchar(500) | YES  |     | NULL              |                             |
+| keyword     | varchar(300) | NO   | UNI | NULL              |                             |
+| alert_level | varchar(10)  | YES  |     | NULL              |                             |
+| config_file | text         | YES  |     | NULL              |                             |
+| create_at   | datetime     | NO   |     | NULL              |                             |
+| update_at   | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++-------------+--------------+------+-----+-------------------+-----------------------------+
+```
+
+- 故障管理
+```
++-------------------+--------------+------+-----+-------------------+-----------------------------+
+| Field             | Type         | Null | Key | Default           | Extra                       |
++-------------------+--------------+------+-----+-------------------+-----------------------------+
+| id                | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| fault_name        | varchar(100) | NO   |     | NULL              |                             |
+| fault_level       | varchar(100) | NO   |     | NULL              |                             |
+| fault_state       | varchar(100) | NO   |     | NULL              |                             |
+| fault_penson      | varchar(100) | NO   |     | NULL              |                             |
+| processing_penson | varchar(100) | YES  |     | NULL              |                             |
+| fault_report      | longtext     | YES  |     | NULL              |                             |
+| fault_start_time  | datetime     | NO   |     | NULL              |                             |
+| fault_end_time    | datetime     | NO   |     | NULL              |                             |
+| fault_duration    | varchar(100) | YES  |     | NULL              |                             |
+| fault_issue       | varchar(100) | YES  |     | NULL              |                             |
+| fault_summary     | varchar(100) | YES  |     | NULL              |                             |
+| create_at         | datetime     | NO   |     | NULL              |                             |
+| update_at         | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++-------------------+--------------+------+-----+-------------------+-----------------------------+
+```
+
+- 项目管理
+```
++--------------------+--------------+------+-----+-------------------+-----------------------------+
+| Field              | Type         | Null | Key | Default           | Extra                       |
++--------------------+--------------+------+-----+-------------------+-----------------------------+
+| id                 | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| project_name       | varchar(100) | NO   |     | NULL              |                             |
+| project_status     | varchar(100) | NO   |     | NULL              |                             |
+| project_requester  | varchar(100) | NO   |     | NULL              |                             |
+| project_processing | varchar(100) | NO   |     | NULL              |                             |
+| project_start_time | datetime     | NO   |     | NULL              |                             |
+| project_end_time   | datetime     | NO   |     | NULL              |                             |
+| create_at          | datetime     | NO   |     | NULL              |                             |
+| update_at          | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++--------------------+--------------+------+-----+-------------------+-----------------------------+
+```
+
+- 事件记录
+```
++------------------+--------------+------+-----+-------------------+-----------------------------+
+| Field            | Type         | Null | Key | Default           | Extra                       |
++------------------+--------------+------+-----+-------------------+-----------------------------+
+| id               | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| event_name       | varchar(100) | NO   |     | NULL              |                             |
+| event_status     | varchar(100) | NO   |     | NULL              |                             |
+| event_level      | varchar(100) | NO   |     | NULL              |                             |
+| event_processing | varchar(100) | NO   |     | NULL              |                             |
+| event_start_time | datetime     | NO   |     | NULL              |                             |
+| event_end_time   | datetime     | NO   |     | NULL              |                             |
+| create_at        | datetime     | NO   |     | NULL              |                             |
+| update_at        | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++------------------+--------------+------+-----+-------------------+-----------------------------+
+```
