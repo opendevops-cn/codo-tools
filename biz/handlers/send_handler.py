@@ -8,14 +8,14 @@
 
 import tornado.web
 import json
-from libs.database import db_session, model_to_dict
+from libs.database import model_to_dict
 from models.alert import PrometheusAlert
 from websdk.utils import SendSms, SendMail
 from websdk.consts import const
 from websdk.tools import convert
 from websdk.configs import configs
 from websdk.db_context import DBContext
-from biz.write_redis import redis_conn
+from biz.promethues_write_redis import redis_conn
 
 
 class AlterHanlder(tornado.web.RequestHandler):

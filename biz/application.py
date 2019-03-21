@@ -11,8 +11,9 @@ from websdk.application import Application as myApplication
 from biz.handlers.send_handler import alert_urls
 from biz.handlers.fault_mg_handler import fault_urls
 from biz.handlers.project_mg_handler import project_urls
-from biz.handlers.event_record_handler import event_record_urls
-from biz.write_redis import tail_data
+from biz.handlers.event_mg_handler import event_urls
+from biz.handlers.paid_mg_handler import paid_urls
+# from biz.tail_data import tail_data
 
 
 class Application(myApplication):
@@ -21,9 +22,11 @@ class Application(myApplication):
         urls.extend(alert_urls)
         urls.extend(fault_urls)
         urls.extend(project_urls)
-        urls.extend(event_record_urls)
-        tailed_callback = tornado.ioloop.PeriodicCallback(tail_data, 3600000)
-        tailed_callback.start()
+        urls.extend(event_urls)
+        urls.extend(paid_urls)
+        # Application 放一些定时任务 ，可能会导致阻塞， 放到了crontab_app里面，单独起
+        # tailed_callback = tornado.ioloop.PeriodicCallback(tail_data, 3600000)  # 一小时执行一次
+        # tailed_callback.start()
         super(Application, self).__init__(urls, **settings)
 
 

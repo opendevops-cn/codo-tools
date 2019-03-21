@@ -1,5 +1,7 @@
 ### 运维工具
 
+> 注释： 还没完全完善，正在赶写~~~
+
 #### 部署文档
 
 **创建数据库**
@@ -18,6 +20,7 @@ python3 db_sync.py
 ```
 # sh run.sh
 python3 startup.py --service=tools --port=8040
+python3 startup.py --service=cron_jobs --port=8050
 ```
 
 #### Prometheus Alert报警
@@ -196,7 +199,7 @@ http://172.16.0.101:8040/v1/tools/project/
 - GET
 
 ```
-http://172.16.0.101:8040/v1/tools/event_record/
+http://172.16.0.101:8040/v1/tools/event/
 ```
 
 - POST
@@ -230,7 +233,37 @@ http://172.16.0.101:8040/v1/tools/event_record/
 }
 ```
 
+#### 付费管理
 
+- GET
+
+```
+http://172.16.0.101:8040/v1/tools/paid/
+```
+
+- POST
+```
+{
+
+            "paid_name": "VPN 线路续费",
+            "paid_start_time": "2019-03-10",
+            "paid_end_time": "2019-03-21",
+            "reminder_day": 3
+}
+```
+
+
+- PATCH
+```
+{
+	
+			"id": 1,
+            "paid_name": "VPN 线路续费update",
+            "paid_start_time": "2019-03-10",
+            "paid_end_time": "2019-03-21",
+            "reminder_day": 3
+}
+```
 
 ### 表结构
 
@@ -305,4 +338,21 @@ keyword：关键字，也就是AlertName,进行关联用户，然后进行报警
 | create_at        | datetime     | NO   |     | NULL              |                             |
 | update_at        | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
 +------------------+--------------+------+-----+-------------------+-----------------------------+
+
+```
+
+- 付费管理
+```
++-----------------+--------------+------+-----+-------------------+-----------------------------+
+| Field           | Type         | Null | Key | Default           | Extra                       |
++-----------------+--------------+------+-----+-------------------+-----------------------------+
+| id              | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| paid_name       | varchar(100) | NO   |     | NULL              |                             |
+| paid_start_time | datetime     | NO   |     | NULL              |                             |
+| paid_end_time   | datetime     | NO   |     | NULL              |                             |
+| reminder_day    | int(11)      | YES  |     | NULL              |                             |
+| reminder_names  | varchar(200) | NO   |     | NULL              |                             |
+| create_at       | datetime     | NO   |     | NULL              |                             |
+| update_at       | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++-----------------+--------------+------+-----+-------------------+-----------------------------+
 ```

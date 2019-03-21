@@ -2,27 +2,15 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2019/3/12 9:32
 # @Author  : Fred Yangxiaofei
-# @File    : write_redis.py
+# @File    : promethues_write_redis.py
 # @Role    : 获取用户联系信息和报警信息管道写入redis
 
 import json
-import redis
-import sys
-from settings import settings
-from websdk.consts import const
 from libs.database import db_session
-from models.alert import PrometheusAlert
 from libs.database import model_to_dict
-
-
-def redis_conn():
-    redis_configs = settings[const.REDIS_CONFIG_ITEM][const.DEFAULT_RD_KEY]
-
-    pool = redis.ConnectionPool(host=redis_configs['host'], port=redis_configs['port'],
-                                password=redis_configs['password'], db=redis_configs[const.RD_DB_KEY],
-                                decode_responses=True)
-    redis_con = redis.Redis(connection_pool=pool)
-    return redis_con
+from libs.redis_connect import redis_conn
+from biz.get_userinfo import get_user_info
+from models.alert import PrometheusAlert
 
 
 def get_alert_info():
@@ -41,18 +29,7 @@ def get_alert_info():
     return alert_list
 
 
-def get_user_data():
-    """
-    从Devops平台获取用户信息，如：Email,SMS等
-    :return:
-    """
-    r = redis_conn()
-    data_set = r.smembers(const.USERS_INFO)
-    userdata = list(data_set)
-    return userdata
-
-
-def tail_data():
+def save_data():
     """
     获取用户联系信息和报警信息管道写入redis
     :return:
@@ -60,10 +37,10 @@ def tail_data():
 
     alert_data = get_alert_info()
 
-    user_data = get_user_data()
+    user_data = get_user_info()
     userdata = [json.loads(x) for x in user_data]
-    r = redis_conn()
-    with r.pipeline(transaction=False) as p:
+
+    with redis_conn.pipeline(transaction=False) as p:
         for alert in alert_data:
             for u in userdata:
                 if alert.get('nicknames'):
@@ -75,4 +52,4 @@ def tail_data():
 
 
 if __name__ == '__main__':
-    tail_data()
+    pass

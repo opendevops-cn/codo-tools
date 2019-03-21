@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2019/3/20 19:19
 # @Author  : Fred Yangxiaofei
-# @File    : event_record_handler.py
+# @File    : event_mg_handler.py
 # @Role    : 事件记录路由
 
 
@@ -89,6 +89,6 @@ class EventRecordHandler(tornado.web.RequestHandler):
         self.write(dict(code=0, msg='更新成功'))
 
 
-event_record_urls = [
-    (r"/v1/tools/event_record/", EventRecordHandler),
+event_urls = [
+    (r"/v1/tools/event/", EventRecordHandler),
 ]
