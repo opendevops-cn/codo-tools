@@ -144,7 +144,7 @@ def check_reminder():
                             <table>
                                 <tr class="desc">
                                     <td>名称</td>
-                                    <td>过期名称</td>
+                                    <td>过期时间</td>
                                     <td>提前通知天数</td>
                                 </tr>
                             """
