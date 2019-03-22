@@ -14,6 +14,7 @@ from biz.handlers.project_mg_handler import project_urls
 from biz.handlers.event_mg_handler import event_urls
 from biz.handlers.paid_mg_handler import paid_urls
 # from biz.tail_data import tail_data
+from biz.handlers.password_handler import password_urls
 
 
 class Application(myApplication):
@@ -24,6 +25,8 @@ class Application(myApplication):
         urls.extend(project_urls)
         urls.extend(event_urls)
         urls.extend(paid_urls)
+        urls.extend(password_urls)
+
         # Application 放一些定时任务 ，可能会导致阻塞， 放到了crontab_app里面，单独起
         # tailed_callback = tornado.ioloop.PeriodicCallback(tail_data, 3600000)  # 一小时执行一次
         # tailed_callback.start()

@@ -133,9 +133,6 @@ def check_reminder():
                             """
             content += """
                             <div class="bodydiv">
-                            <div class="tc">
-                                <img src="http://www.opendevops.cn/images/logo.png" height="150" width="150"/>
-                            </div>
                                 Hi, Ops：
                                 <div class="content">
                                     你有以下事项提醒需要关注

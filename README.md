@@ -265,6 +265,22 @@ http://172.16.0.101:8040/v1/tools/paid/
 }
 ```
 
+
+##### 随机密码
+- GET
+```
+http://172.16.0.101:8040/v1/tools/password/?num=16
+
+#返回结果
+{
+    "code": 0,
+    "msg": "获取成功",
+    "data": "NTLWOB1aVH7Uhlxv"
+}
+```
+
+
+
 ### 表结构
 
 - Promethes Alert报警
