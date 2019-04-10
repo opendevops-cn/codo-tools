@@ -26,8 +26,7 @@ class Fault(Base):
     fault_report = Column(LONGTEXT, nullable=True)  # 故障报告，附件
     fault_start_time = Column(DateTime, nullable=False)  # 故障开始时间
     fault_end_time = Column(DateTime, nullable=False)  # 故障结束时间
-    fault_duration = Column(String(100), nullable=True)  # 故障影响时间，分钟
-    fault_issue = Column(String(100), nullable=True)  # 故障原因
-    fault_summary = Column(String(100), nullable=True)  # 故障总结
+    fault_issue = Column(LONGTEXT, nullable=True)  # 故障原因
+    fault_summary = Column(LONGTEXT, nullable=True)  # 故障总结
     create_at = Column(DateTime, nullable=False, default=datetime.now())  # 记录创建时间
     update_at = Column(TIMESTAMP, nullable=False, default=datetime.now())  # 记录更新时间

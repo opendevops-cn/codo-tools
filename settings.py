@@ -15,12 +15,14 @@ cookie_secret = '61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2X6TP1o/Vo='
 static_path = os.path.join(os.path.dirname(__file__), "static")
 template_path = os.path.join(os.path.dirname(__file__), "templates"),
 
+#数据库配置信息
 DEFAULT_DB_DBHOST = os.getenv('DEFAULT_DB_DBHOST', '172.16.0.223')
 DEFAULT_DB_DBPORT = os.getenv('DEFAULT_DB_DBPORT', '3306')
 DEFAULT_DB_DBUSER = os.getenv('DEFAULT_DB_DBUSER', 'root')
 DEFAULT_DB_DBPWD = os.getenv('DEFAULT_DB_DBPWD', 'ljXrcyn7chaBU4F')
 DEFAULT_DB_DBNAME = os.getenv('DEFAULT_DB_DBNAME', 'codo_tools')
 
+#redis配置，最好和codo-admin配置保持一致，因为codo-admin有用户数据缓存到Redis我这要用到
 DEFAULT_REDIS_HOST = os.getenv('DEFAULT_REDIS_HOST', '172.16.0.223')
 DEFAULT_REDIS_PORT = os.getenv('DEFAULT_REDIS_PORT', '6379')
 DEFAULT_REDIS_DB = 8
@@ -36,9 +38,11 @@ EMAIL_HOST = os.getenv('EMAIL_HOST','smtp.exmail.qq.com'),
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '1'),  # redis取出来 1：表示True
 EMAIL_PORT = os.getenv('EMAIL_PORT',465),
 
+#阿里云SNS服务配置，模板信息和模板Code
 sign_name = 'ShineZone',
 template_code = 'SMS_135044115',
-default_email = '191715030@qq.com',
+# 如果平台里面告警管理没有配置发送人，则发送默认邮箱
+default_email = '1923671815@qq.com',
 try:
     from local_settings import *
 except:

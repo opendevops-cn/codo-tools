@@ -109,14 +109,13 @@ class SendHanlder(tornado.web.RequestHandler):
             labels = alerts_data.get('labels')
             alert_name = labels.get('alertname')
             print('alert_name---->',alert_name)
-            cache_conn = redis_conn()
-            cache_config_info = cache_conn.hgetall(const.APP_SETTINGS)
+            cache_config_info = redis_conn.hgetall(const.APP_SETTINGS)
             if  cache_config_info:
                 config_info = convert(cache_config_info)
             else:
                 config_info = configs['email_info']
 
-            emails_list = cache_conn.hvals(alert_name)
+            emails_list = redis_conn.hvals(alert_name)
             print('Email_list----->',emails_list)
             sm = SendMail(mail_host=config_info.get(const.EMAIL_HOST), mail_port=config_info.get(const.EMAIL_PORT),
                           mail_user=config_info.get(const.EMAIL_HOST_USER),
@@ -137,7 +136,7 @@ class SendHanlder(tornado.web.RequestHandler):
                 if not configs.get('sign_name') or not  configs.get('template_code'):
                     sm.send_mail(configs.get('default_email'), alert_name, '请配置短信的sign_name和template_code')
                 else:
-                    phone_numbers = cache_conn.hkeys(alert_name)
+                    phone_numbers = redis_conn.hkeys(alert_name)
                     # 发送内容
                     params = {"msg": alerts_data['annotations']['detail']}
                     sms = SendSms(config_info.get(const.SMS_REGION), config_info.get(const.SMS_DOMAIN),

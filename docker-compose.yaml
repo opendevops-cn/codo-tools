@@ -1,9 +1,9 @@
-tornado_alert:
+codo_tools:
   restart: unless-stopped
-  image: tornado_alert:latest
+  image: codo_tools:latest
   volumes:
     - /var/log/supervisor/:/var/log/supervisor/
     - /sys/fs/cgroup:/sys/fs/cgroup
   ports:
-    - "5000:5000"
-  hostname: tornado_alert
+    - "8040:80"
+  hostname: codo-tools

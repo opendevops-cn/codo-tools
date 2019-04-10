@@ -10,27 +10,26 @@ RUN yum update -y && yum install epel-release -y && yum update -y && yum install
 #WORKDIR /var/www/
 
 # 2. 准备python
-RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tar.xz
-RUN xz -d Python-3.6.4.tar.xz && tar xvf Python-3.6.4.tar && cd Python-3.6.4 && ./configure && make && make install
+RUN wget https://www.python.org/ftp/python/3.6.6/Python-3.6.6.tar.xz
+RUN xz -d Python-3.6.6.tar.xz && tar xvf Python-3.6.6.tar && cd Python-3.6.6 && ./configure && make && make install
 
 # 3. 安装yum依赖
 
 # 4. 复制代码
-RUN mkdir -p /opt/tornado_alert/
-ADD . /opt/tornado_alert/
+RUN mkdir -p /var/www/
+ADD . /var/www/codo-tools/
 
 # 5. 安装pip依赖
-WORKDIR /opt/tornado_alert/
-RUN pip3 install -U pip
+RUN pip3 install --upgrade pip
 RUN pip3 install -U git+https://github.com/ss1917/ops_sdk.git
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r /var/www/codo-tools/doc/requirements.txt
 
 # 6. 日志
-# VOLUME /var/log/
+VOLUME /var/log/
 
 # 7. 准备文件
-#COPY supervisord.conf  /etc/supervisord.conf
+COPY doc/nginx_ops.conf /etc/nginx/conf.d/default.conf
+COPY doc/supervisor_ops.conf  /etc/supervisord.conf
 
-RUN chmod +x /opt/tornado_alert/run.sh
-EXPOSE 5000
-ENTRYPOINT ["/opt/tornado_alert/run.sh"]
+EXPOSE 80
+CMD ["/usr/bin/supervisord"]

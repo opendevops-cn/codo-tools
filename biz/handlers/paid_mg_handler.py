@@ -8,6 +8,8 @@
 
 import tornado.web
 import json
+import re
+import datetime
 from libs.database import model_to_dict
 from models.paid_mg import PaidMG
 from websdk.db_context import DBContext
@@ -21,12 +23,19 @@ class PaidMGHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
+        page_size = self.get_argument('page', default=1, strip=True)
+        limit = self.get_argument('limit', default=10, strip=True)
+        limit_start = (int(page_size) - 1) * int(limit)
         paid_list = []
         with DBContext('w') as session:
             if key and value:
-                paid_data = session.query(PaidMG).filter_by(**{key: value}).all()
+                count = session.query(PaidMG).filter_by(**{key: value}).count()
+                paid_data = session.query(PaidMG).filter_by(**{key: value}).order_by(
+                    PaidMG.id).offset(limit_start).limit(int(limit))
             else:
-                paid_data = session.query(PaidMG).all()
+                count = session.query(PaidMG).count()
+                paid_data = session.query(PaidMG).order_by(PaidMG.id).offset(
+                    limit_start).limit(int(limit))
 
         for data in paid_data:
             data_dict = model_to_dict(data)
@@ -34,8 +43,10 @@ class PaidMGHandler(tornado.web.RequestHandler):
             data_dict['paid_end_time'] = str(data_dict['paid_end_time'])
             data_dict['create_at'] = str(data_dict['create_at'])
             data_dict['update_at'] = str(data_dict['update_at'])
+            if data_dict['nicknames']:
+                data_dict['nicknames'] = data_dict['nicknames'].split(',')
             paid_list.append(data_dict)
-        return self.write(dict(code=0, msg='获取成功', data=paid_list))
+        return self.write(dict(code=0, msg='获取成功', count=count, data=paid_list))
 
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
@@ -43,12 +54,23 @@ class PaidMGHandler(tornado.web.RequestHandler):
         paid_start_time = data.get('paid_start_time', None)
         paid_end_time = data.get('paid_end_time', None)
         reminder_day = data.get('reminder_day', None)
-        nicknames = data.get('nicknames', None)
+        nicknames = data.get('nicknames', '')
 
         if not paid_name or not paid_start_time or not paid_end_time or not reminder_day or not nicknames:
             return self.write(dict(code=-2, msg='关键参数不能为空'))
 
+        if nicknames:
+            nicknames = ','.join(nicknames)
+
+        paid_start_time = datetime.datetime.strptime(paid_start_time, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(
+            hours=8)
+        paid_end_time = datetime.datetime.strptime(paid_end_time, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(
+            hours=8)
+
         with DBContext('w', None, True) as session:
+            name = session.query(PaidMG).filter(PaidMG.paid_name == paid_name).first()
+            if name:
+                return self.write(dict(code=-2, msg='{}已经存在'.format(paid_name)))
             session.add(
                 PaidMG(paid_name=paid_name, paid_start_time=paid_start_time, paid_end_time=paid_end_time,
                        reminder_day=reminder_day, nicknames=nicknames))
@@ -66,7 +88,7 @@ class PaidMGHandler(tornado.web.RequestHandler):
 
         self.write(dict(code=0, msg='删除成功'))
 
-    def patch(self, *args, **kwargs):
+    def put(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
         paid_id = data.get('id')
         paid_name = data.get('paid_name', None)
@@ -75,16 +97,31 @@ class PaidMGHandler(tornado.web.RequestHandler):
         reminder_day = data.get('reminder_day', None)
         nicknames = data.get('nicknames', None)
 
+        if not paid_name or not paid_start_time or not paid_end_time or not reminder_day or not nicknames:
+            return self.write(dict(code=-2, msg='关键参数不能为空'))
+
+        if nicknames:
+            nicknames = ','.join(nicknames)
+
         update_info = {
-            "paid_name": paid_name,
             "paid_start_time": paid_start_time,
             "paid_end_time": paid_end_time,
             "reminder_day": reminder_day,
             "nicknames": nicknames
         }
-        with DBContext('w', None, True) as session:
-            session.query(PaidMG).filter(PaidMG.id == paid_id).update(update_info)
 
+        if re.search('000Z', paid_start_time):
+            paid_start_time = datetime.datetime.strptime(paid_start_time,
+                                                         "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(hours=8)
+            update_info['paid_start_time'] = paid_start_time
+
+        if re.search('000Z', paid_end_time):
+            paid_end_time = datetime.datetime.strptime(paid_end_time, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(
+                hours=8)
+            update_info['paid_end_time'] = paid_end_time
+
+        with DBContext('w', None, True) as session:
+            session.query(PaidMG).filter(PaidMG.paid_name == paid_name).update(update_info)
         self.write(dict(code=0, msg='更新成功'))
 
 

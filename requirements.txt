@@ -1,6 +1,0 @@
-opssdk
-redis
-fire
-shortuuid
-SQLAlchemy
-tornado==5.0

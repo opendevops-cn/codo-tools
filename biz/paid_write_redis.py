@@ -24,6 +24,8 @@ def get_paid_info():
     """
     paid_list = []
     paid_data = db_session.query(PaidMG).all()
+    db_session.close()
+
 
     for data in paid_data:
         data_dict = model_to_dict(data)
@@ -48,11 +50,11 @@ def save_data():
     userdata = [json.loads(x) for x in user_data]
     with redis_conn.pipeline(transaction=False) as p:
         for remind in paid_data:
-            # print(remind)
+            print(remind)
             for u in userdata:
                 if remind.get('nicknames'):
                     if u.get('nickname') in remind.get('nicknames').split(','):
-                        # print(remind.get('paid_name'), {u.get('tel'): u.get('email')})
+                        #print(remind.get('paid_name'), {u.get('tel'): u.get('email')})
                         save_data = {u.get('tel'): u.get('email')}
                         p.hmset(remind.get('paid_name'), save_data)
         p.execute()
@@ -80,6 +82,9 @@ def check_reminder():
     for msg in db_session.query(PaidMG).all():
         reminder_time = msg.paid_end_time - datetime.timedelta(days=int(msg.reminder_day))
         if reminder_time <= datetime.datetime.now():
+            emails_list = redis_conn.hvals(msg.paid_name)
+            print('msg_name---->',msg.paid_name)
+            print('email_list---->',emails_list)
             content = """
                             <!DOCTYPE html>
                             <html lang="en">
@@ -161,8 +166,8 @@ def check_reminder():
 
                         """
             # send_msg = msg.paid_name + "\n到期时间：" + str(msg.paid_end_time)
-            # sm.send_mail("yanghongfei@shinezone.com", "运维信息提醒", send_msg)
-            sm.send_mail(msg.nicknames, '运维提醒信息', content, subtype='html')
+            #sm.send_mail("yanghongfei@shinezone.com", "运维信息提醒", send_msg)
+            sm.send_mail(",".join(emails_list), '运维提醒信息', content, subtype='html')
 
 
 def main():
@@ -175,4 +180,5 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    main()
+    #pass

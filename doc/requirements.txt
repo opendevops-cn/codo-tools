@@ -1,0 +1,8 @@
+redis
+SQLAlchemy
+oss2
+opssdk
+tornado
+fire
+shortuuid
+pycryptodome
