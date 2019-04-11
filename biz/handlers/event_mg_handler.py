@@ -13,6 +13,7 @@ import datetime
 from libs.database import model_to_dict
 from models.event_record import EventRecord
 from websdk.db_context import DBContext
+from websdk.base_handler import LivenessProbe
 
 
 class EventRecordHandler(tornado.web.RequestHandler):
@@ -119,4 +120,5 @@ class EventRecordHandler(tornado.web.RequestHandler):
 
 event_urls = [
     (r"/v1/tools/event/", EventRecordHandler),
+    (r"/are_you_ok/", LivenessProbe),
 ]
