@@ -50,7 +50,7 @@ def save_data():
     userdata = [json.loads(x) for x in user_data]
     with redis_conn.pipeline(transaction=False) as p:
         for remind in paid_data:
-            print(remind)
+            # print(remind)
             for u in userdata:
                 if remind.get('nicknames'):
                     if u.get('nickname') in remind.get('nicknames').split(','):
