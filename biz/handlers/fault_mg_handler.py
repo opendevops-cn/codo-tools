@@ -141,7 +141,7 @@ class FaultHandler(BaseHandler):
         self.write(dict(code=0, msg='更新成功'))
 
 
-class UpLoadFileHandler(BaseHandler):
+class UpLoadFileHandler(tornado.web.RequestHandler):
     def post(self, *args, **kwargs):
         ###文件保存到本地
         # Base_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -198,7 +198,7 @@ class UpLoadFileHandler(BaseHandler):
                     oss_data.get('STORAGE_NAME'), oss_data.get('STORAGE_PATH'))
                 obj.setObj(filename, file_data)
             except Exception as e:
-                return self.write(dict(code=-1, msg='上传失败，请检查配置'))
+                return self.write(dict(code=-1, msg='上传失败，请检查OSS配置'))
 
 
         self.write(dict(code=0, msg="上传成功"))
