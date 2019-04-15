@@ -24,7 +24,7 @@ def tail_data():
 
     # 范围时间
     d_time = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '9:00', '%Y-%m-%d%H:%M')
-    d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '11:30', '%Y-%m-%d%H:%M')
+    d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '10:10', '%Y-%m-%d%H:%M')
 
     # print(d_time)
     # print(d_time1)
