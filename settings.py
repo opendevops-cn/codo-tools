@@ -9,7 +9,7 @@ import os
 from websdk.consts import const
 
 debug = True
-xsrf_cookies = False
+xsrf_cookies = True
 expire_seconds = 365 * 24 * 60 * 60
 cookie_secret = '61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2X6TP1o/Vo='
 static_path = os.path.join(os.path.dirname(__file__), "static")

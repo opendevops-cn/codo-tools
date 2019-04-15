@@ -20,9 +20,10 @@ from websdk.tools import convert
 from websdk.configs import configs
 from biz.promethues_write_redis import redis_conn
 from libs.oss import OSSApi
+from libs.base_handler import BaseHandler
 
 
-class FaultHandler(tornado.web.RequestHandler):
+class FaultHandler(BaseHandler):
 
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
@@ -140,7 +141,7 @@ class FaultHandler(tornado.web.RequestHandler):
         self.write(dict(code=0, msg='更新成功'))
 
 
-class UpLoadFileHandler(tornado.web.RequestHandler):
+class UpLoadFileHandler(BaseHandler):
     def post(self, *args, **kwargs):
         ###文件保存到本地
         # Base_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -202,7 +203,7 @@ class UpLoadFileHandler(tornado.web.RequestHandler):
 
         self.write(dict(code=0, msg="上传成功"))
 
-class GetBucketInfoHandler(tornado.web.RequestHandler):
+class GetBucketInfoHandler(BaseHandler):
     def get(self, *args, **kwargs):
         """从redis获取阿里云OSS基本信息"""
         cache_config_info = redis_conn.hgetall(const.APP_SETTINGS)

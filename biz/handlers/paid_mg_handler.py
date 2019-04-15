@@ -17,9 +17,10 @@ from websdk.utils import SendSms, SendMail
 from websdk.consts import const
 from websdk.tools import convert
 from websdk.configs import configs
+from libs.base_handler import BaseHandler
 
 
-class PaidMGHandler(tornado.web.RequestHandler):
+class PaidMGHandler(BaseHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)

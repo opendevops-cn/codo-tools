@@ -14,9 +14,9 @@ from libs.database import model_to_dict
 from models.event_record import EventRecord
 from websdk.db_context import DBContext
 from websdk.base_handler import LivenessProbe
+from libs.base_handler import BaseHandler
 
-
-class EventRecordHandler(tornado.web.RequestHandler):
+class EventRecordHandler(BaseHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)

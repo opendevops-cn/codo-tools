@@ -16,9 +16,10 @@ from websdk.tools import convert
 from websdk.configs import configs
 from websdk.db_context import DBContext
 from biz.promethues_write_redis import redis_conn
+from libs.base_handler import BaseHandler
 
 
-class AlterHanlder(tornado.web.RequestHandler):
+class AlterHanlder(BaseHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
@@ -99,7 +100,7 @@ class AlterHanlder(tornado.web.RequestHandler):
         self.write(dict(code=0, msg='关联用户成功'))
 
 
-class SendHanlder(tornado.web.RequestHandler):
+class SendHanlder(BaseHandler):
 
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))

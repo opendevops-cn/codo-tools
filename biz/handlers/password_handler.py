@@ -9,9 +9,10 @@
 import tornado.web
 import string
 import random
+from libs.base_handler import BaseHandler
 
 
-class PasswordHandler(tornado.web.RequestHandler):
+class PasswordHandler(BaseHandler):
     def get(self, *args, **kwargs):
         num = self.get_argument('num', default=None, strip=True)
         if not num:
