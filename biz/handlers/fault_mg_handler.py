@@ -23,7 +23,7 @@ from libs.oss import OSSApi
 from libs.base_handler import BaseHandler
 
 
-class FaultHandler(BaseHandler):
+class FaultHandler(tornado.web.RequestHandler):
 
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
@@ -203,7 +203,7 @@ class UpLoadFileHandler(tornado.web.RequestHandler):
 
         self.write(dict(code=0, msg="上传成功"))
 
-class GetBucketInfoHandler(BaseHandler):
+class GetBucketInfoHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         """从redis获取阿里云OSS基本信息"""
         cache_config_info = redis_conn.hgetall(const.APP_SETTINGS)

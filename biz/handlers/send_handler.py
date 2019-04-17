@@ -19,7 +19,7 @@ from biz.promethues_write_redis import redis_conn
 from libs.base_handler import BaseHandler
 
 
-class AlterHanlder(BaseHandler):
+class AlterHanlder(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
@@ -100,7 +100,7 @@ class AlterHanlder(BaseHandler):
         self.write(dict(code=0, msg='关联用户成功'))
 
 
-class SendHanlder(BaseHandler):
+class SendHanlder(tornado.web.RequestHandler):
 
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))

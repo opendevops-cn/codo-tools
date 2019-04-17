@@ -16,7 +16,7 @@ from websdk.db_context import DBContext
 from websdk.base_handler import LivenessProbe
 from libs.base_handler import BaseHandler
 
-class EventRecordHandler(BaseHandler):
+class EventRecordHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
