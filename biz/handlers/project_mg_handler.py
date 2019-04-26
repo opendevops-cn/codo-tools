@@ -13,9 +13,10 @@ import datetime
 from libs.database import model_to_dict
 from models.project_mg import ProjectMG
 from websdk.db_context import DBContext
+from libs.base_handler import BaseHandler
 
 
-class ProjectMGHandler(tornado.web.RequestHandler):
+class ProjectMGHandler(BaseHandler):
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)

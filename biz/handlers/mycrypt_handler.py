@@ -11,7 +11,7 @@ from biz.mycrypt import MyCrypt
 import binascii
 from libs.base_handler import BaseHandler
 
-class MyCryptHandler(tornado.web.RequestHandler):
+class MyCryptHandler(BaseHandler):
 
     def get(self, *args, **kwargs):
         key = self.get_argument('key', default=None, strip=True)
