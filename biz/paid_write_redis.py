@@ -60,6 +60,7 @@ def save_data():
         p.execute()
 
 
+
 def check_reminder():
     """
     用途：
@@ -80,94 +81,103 @@ def check_reminder():
                   mail_ssl=True if config_info.get(const.EMAIL_USE_SSL) == '1' else False)
 
     for msg in db_session.query(PaidMG).all():
+        if msg.paid_end_time < datetime.datetime.now():
+            email_content = '{}已过期，请删除该提醒'.format(msg.paid_name)
+            exp_paid_name = msg.paid_name
+            emails_list = redis_conn.hvals(msg.paid_name)
+            sm.send_mail(",".join(emails_list),'运维提醒信息',email_content)
         reminder_time = msg.paid_end_time - datetime.timedelta(days=int(msg.reminder_day))
         if reminder_time <= datetime.datetime.now():
-            emails_list = redis_conn.hvals(msg.paid_name)
-            print('msg_name---->',msg.paid_name)
-            print('email_list---->',emails_list)
-            content = """
-                            <!DOCTYPE html>
-                            <html lang="en">
-                            <head>
-                                <meta charset="UTF-8">
-                                <title>OpenDevOps运维提醒邮件</title>
-                                <style type="text/css">
-                                    p {
-                                        width: 100%;
-                                        margin: 30px 0 30px 0;
-                                        height: 30px;
-                                        line-height: 30px;
-                                        text-align: center;
-
-                                    }
-
-                                    table {
-                                        width: 100%;
-                                        text-align: center;
-                                        border-collapse: collapse;
-                                    }
-
-                                    tr.desc {
-                                        background-color: #E8E8E8;
-                                        height: 30px;
-                                    }
-
-                                    tr.desc td {
-                                        border-color: black;
-                                    }
-
-                                    td {
-                                        height: 30px;
-                                    }
-                                </style>
-                                <style>
-                                    .bodydiv {
-                                        width: 60%;
-                                        margin: 0 auto;
-                                    }
-
-                                    .tc {
-                                        text-align: center;
-                                    }
-
-                                    .content {
-                                        margin: 10px 0 10px 30px;
-                                    }
-                                </style>
-                            </head>
-                            """
-            content += """
-                            <div class="bodydiv">
-                                Hi, Ops：
-                                <div class="content">
-                                    你有以下事项提醒需要关注
-                                </div>
-
-                            <table>
-                                <tr class="desc">
-                                    <td>名称</td>
-                                    <td>过期时间</td>
-                                    <td>提前通知天数</td>
-                                </tr>
-                            """
-
-            content += """
-                                    <tr>
-                                    <td>{}</td>
-                                    <td>{}</td>
-                                    <td>{}</td>
-                                     </tr>""".format(msg.paid_name, msg.paid_end_time, msg.reminder_day)
-
-            content += """
-                                </table>
-                                </div>
-                                </body>
-                                </html>
-
-                        """
+            if msg.paid_name != exp_paid_name:
+                remainder_time = msg.paid_end_time - datetime.datetime.now()
+                email_content = ('{}还有{}天到期，请留意'.format(msg.paid_name, remainder_time.days))
+                emails_list = redis_conn.hvals(msg.paid_name)
+                sm.send_mail(",".join(emails_list), '运维提醒信息', email_content)
+                # print('msg_name---->',msg.paid_name)
+                # print('email_list---->',emails_list)
+            # content = """
+            #                 <!DOCTYPE html>
+            #                 <html lang="en">
+            #                 <head>
+            #                     <meta charset="UTF-8">
+            #                     <title>OpenDevOps运维提醒邮件</title>
+            #                     <style type="text/css">
+            #                         p {
+            #                             width: 100%;
+            #                             margin: 30px 0 30px 0;
+            #                             height: 30px;
+            #                             line-height: 30px;
+            #                             text-align: center;
+            #
+            #                         }
+            #
+            #                         table {
+            #                             width: 100%;
+            #                             text-align: center;
+            #                             border-collapse: collapse;
+            #                         }
+            #
+            #                         tr.desc {
+            #                             background-color: #E8E8E8;
+            #                             height: 30px;
+            #                         }
+            #
+            #                         tr.desc td {
+            #                             border-color: black;
+            #                         }
+            #
+            #                         td {
+            #                             height: 30px;
+            #                         }
+            #                     </style>
+            #                     <style>
+            #                         .bodydiv {
+            #                             width: 60%;
+            #                             margin: 0 auto;
+            #                         }
+            #
+            #                         .tc {
+            #                             text-align: center;
+            #                         }
+            #
+            #                         .content {
+            #                             margin: 10px 0 10px 30px;
+            #                         }
+            #                     </style>
+            #                 </head>
+            #                 """
+            # content += """
+            #                 <div class="bodydiv">
+            #                     Hi, Ops：
+            #                     <div class="content">
+            #                         你有以下事项提醒需要关注
+            #                     </div>
+            #
+            #                 <table>
+            #                     <tr class="desc">
+            #                         <td>名称</td>
+            #                         <td>过期时间</td>
+            #                         <td>提前通知天数</td>
+            #                     </tr>
+            #                 """
+            #
+            # content += """
+            #                         <tr>
+            #                         <td>{}</td>
+            #                         <td>{}</td>
+            #                         <td>{}</td>
+            #                          </tr>""".format(msg.paid_name, msg.paid_end_time, msg.reminder_day)
+            #
+            # content += """
+            #                     </table>
+            #                     </div>
+            #                     </body>
+            #                     </html>
+            #
+            #             """
             # send_msg = msg.paid_name + "\n到期时间：" + str(msg.paid_end_time)
             #sm.send_mail("yanghongfei@shinezone.com", "运维信息提醒", send_msg)
-            sm.send_mail(",".join(emails_list), '运维提醒信息', content, subtype='html')
+            # sm.send_mail(",".join(emails_list), '运维提醒信息', content, subtype='html')
 
 
 def main():
