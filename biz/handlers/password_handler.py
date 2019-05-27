@@ -6,7 +6,7 @@
 # @Role    : 随机密码生成路由
 
 
-import tornado.web
+
 import string
 import random
 from libs.base_handler import BaseHandler

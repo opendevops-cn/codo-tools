@@ -6,7 +6,7 @@
 # @Role    : 事件记录路由
 
 
-import tornado.web
+
 import json
 import re
 import datetime
@@ -21,7 +21,7 @@ class EventRecordHandler(BaseHandler):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
         page_size = self.get_argument('page', default=1, strip=True)
-        limit = self.get_argument('limit', default=10, strip=True)
+        limit = self.get_argument('limit', default=15, strip=True)
         limit_start = (int(page_size) - 1) * int(limit)
         event_record_list = []
         with DBContext('w') as session:

@@ -6,17 +6,12 @@
 # @Role    : 付费管理路由
 
 
-import tornado.web
 import json
 import re
 import datetime
 from libs.database import model_to_dict
 from models.paid_mg import PaidMG
 from websdk.db_context import DBContext
-from websdk.utils import SendSms, SendMail
-from websdk.consts import const
-from websdk.tools import convert
-from websdk.configs import configs
 from libs.base_handler import BaseHandler
 
 
@@ -25,7 +20,7 @@ class PaidMGHandler(BaseHandler):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
         page_size = self.get_argument('page', default=1, strip=True)
-        limit = self.get_argument('limit', default=10, strip=True)
+        limit = self.get_argument('limit', default=15, strip=True)
         limit_start = (int(page_size) - 1) * int(limit)
         paid_list = []
         with DBContext('w') as session:

@@ -6,10 +6,7 @@
 # @Role    : 故障管理路由
 
 
-import tornado.web
 import json
-import os
-import sys
 import re
 import datetime
 from libs.database import model_to_dict
@@ -17,7 +14,6 @@ from models.fault_mg import Fault
 from websdk.db_context import DBContext
 from websdk.consts import const
 from websdk.tools import convert
-from websdk.configs import configs
 from biz.promethues_write_redis import redis_conn
 from libs.oss import OSSApi
 from libs.base_handler import BaseHandler
@@ -29,7 +25,7 @@ class FaultHandler(BaseHandler):
         key = self.get_argument('key', default=None, strip=True)
         value = self.get_argument('value', default=None, strip=True)
         page_size = self.get_argument('page', default=1, strip=True)
-        limit = self.get_argument('limit', default=10, strip=True)
+        limit = self.get_argument('limit', default=15, strip=True)
         limit_start = (int(page_size) - 1) * int(limit)
         fault_list = []
         with DBContext('w') as session:
