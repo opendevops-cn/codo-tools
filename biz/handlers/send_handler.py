@@ -102,11 +102,11 @@ class AlterHanlder(BaseHandler):
         self.write(dict(code=0, msg='关联用户成功'))
 
 
-class SendHanlder(tornado.web.RequestHandler):
+class SendHanlder(BaseHandler):
 
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
-        save_data()  # 用户前端配置的信息写入redis,发送告警使用，默认1小时一次，这是为了立刻添加的让其生效
+        #save_data()  # 用户前端配置的信息写入redis,发送告警使用，默认1小时一次，这是为了立刻添加的让其生效
         # print('data---->', data)
         alerts = data.get('alerts')  # 获取AlertManager POST报警数据
         # alerts = [{'status': 'firing', 'labels': {'alertname': 'Node主机CPU利用率过高', 'instance': '172.16.1.53:9100', 'prometheus': 'monitoring/k8s', 'severity': '严重'}, 'annotations': {'detail': '172.16.1.53:9100: CPU利用率过高于75% (当前值: 92.11666666667345)', 'summary': '172.16.1.53:9100: CPU利用率过高'}, 'startsAt': '2019-03-18T05:34:54.025953211Z', 'endsAt': '0001-01-01T00:00:00Z', 'generatorURL': 'http://prometheus-k8s-1:9090/graph?g0.expr=100+-+%28avg+by%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22node-exporter%22%2Cmode%3D%22idle%22%7D%5B5m%5D%29%29+%2A+100%29+%3E+75&g0.tab=1'}]
