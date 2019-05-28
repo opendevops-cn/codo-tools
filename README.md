@@ -23,12 +23,51 @@
 
 ![](./static/images/promethues_alert.png)
 
+
 示例参考
 
 ![](./static/images/prometheus_alert.png)
 
 ![](./static/images/alertmanager.png)
 
+告警内容
+```
+[Prometheus AlertManager]
+
+
+状态：firing  
+名称：Node主机CPU利用率过高
+告警实例：172.16.1.53:9100
+Namespace：monitoring/k8s
+告警级别：严重
+
+描述信息：
+172.16.1.53:9100: CPU利用率过高于75% (当前值: 92.73333333355065)
+
+```
+
+恢复内容
+```
+[Prometheus AlertManager]
+
+
+状态：resolved
+名称：Node主机CPU利用率过高
+告警实例：172.16.1.53:9100
+Namespace：monitoring/k8s
+告警级别：严重
+
+描述信息：
+172.16.1.53:9100: CPU利用率过高于75% (当前值: 92.75000000023283)
+```
+
+报警截图示例
+
+- Email
+![](./static/images/alert_mail.png) 
+
+- SNS
+![](./static/images/alert_sns.jpg)
 
 
 **提醒管理**

@@ -17,6 +17,8 @@ from websdk.configs import configs
 from websdk.db_context import DBContext
 from biz.promethues_write_redis import redis_conn
 from libs.base_handler import BaseHandler
+from biz.promethues_write_redis import save_data
+from websdk.web_logs import ins_log
 
 
 class AlterHanlder(BaseHandler):
@@ -100,24 +102,32 @@ class AlterHanlder(BaseHandler):
         self.write(dict(code=0, msg='关联用户成功'))
 
 
-class SendHanlder(BaseHandler):
+class SendHanlder(tornado.web.RequestHandler):
 
     def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
+        save_data()  # 用户前端配置的信息写入redis,发送告警使用，默认1小时一次，这是为了立刻添加的让其生效
+        # print('data---->', data)
         alerts = data.get('alerts')  # 获取AlertManager POST报警数据
-        #alerts = [{'status': 'firing', 'labels': {'alertname': 'Node主机CPU利用率过高', 'instance': '172.16.1.53:9100', 'prometheus': 'monitoring/k8s', 'severity': '严重'}, 'annotations': {'detail': '172.16.1.53:9100: CPU利用率过高于75% (当前值: 92.11666666667345)', 'summary': '172.16.1.53:9100: CPU利用率过高'}, 'startsAt': '2019-03-18T05:34:54.025953211Z', 'endsAt': '0001-01-01T00:00:00Z', 'generatorURL': 'http://prometheus-k8s-1:9090/graph?g0.expr=100+-+%28avg+by%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22node-exporter%22%2Cmode%3D%22idle%22%7D%5B5m%5D%29%29+%2A+100%29+%3E+75&g0.tab=1'}]
+        # alerts = [{'status': 'firing', 'labels': {'alertname': 'Node主机CPU利用率过高', 'instance': '172.16.1.53:9100', 'prometheus': 'monitoring/k8s', 'severity': '严重'}, 'annotations': {'detail': '172.16.1.53:9100: CPU利用率过高于75% (当前值: 92.11666666667345)', 'summary': '172.16.1.53:9100: CPU利用率过高'}, 'startsAt': '2019-03-18T05:34:54.025953211Z', 'endsAt': '0001-01-01T00:00:00Z', 'generatorURL': 'http://prometheus-k8s-1:9090/graph?g0.expr=100+-+%28avg+by%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22node-exporter%22%2Cmode%3D%22idle%22%7D%5B5m%5D%29%29+%2A+100%29+%3E+75&g0.tab=1'}]
         for alerts_data in alerts:
-            labels = alerts_data.get('labels')
-            alert_name = labels.get('alertname')
-            print('alert_name---->',alert_name)
+            labels = alerts_data.get('labels')  # 告警内容
+            alert_name = labels.get('alertname')  # 告警名称
+            alert_status = alerts_data.get('status')  # 告警状态
+            alert_severity = labels.get('severity')
+            alert_namespace = labels.get('prometheus')
+            alert_instance = labels.get('instance')
+            alert_detail = alerts_data['annotations']['detail']
+
             cache_config_info = redis_conn.hgetall(const.APP_SETTINGS)
-            if  cache_config_info:
+            if cache_config_info:
                 config_info = convert(cache_config_info)
             else:
                 config_info = configs['email_info']
 
             emails_list = redis_conn.hvals(alert_name)
-            print('Email_list----->',emails_list)
+            ins_log.read_log('info', alert_name)
+            ins_log.read_log('info', emails_list)
             sm = SendMail(mail_host=config_info.get(const.EMAIL_HOST), mail_port=config_info.get(const.EMAIL_PORT),
                           mail_user=config_info.get(const.EMAIL_HOST_USER),
                           mail_password=config_info.get(const.EMAIL_HOST_PASSWORD),
@@ -129,17 +139,23 @@ class SendHanlder(BaseHandler):
                 # print('msg=',alerts_data['annotations']['detail'])
                 return self.write(dict(code=-1, msg="没有匹配到规则"))
 
+            alert_title = 'Prometheus Alert:{}_{}_{}_{}_{}'.format(alert_status, alert_name, alert_instance,
+                                                                   alert_namespace, alert_severity)
+
+            alert_comment = '[Prometheus AlertManager]\n\n\n状态：{}\n名称：{}\n告警实例：{}\nNamespace：{}\n告警级别：{}\n\n描述信息：\n{}'.format(
+                alert_status, alert_name, alert_instance, alert_namespace, alert_severity, alert_detail)
+
             ### 默认发送邮件
-            sm.send_mail(",".join(emails_list), alert_name, alerts_data['annotations']['detail'])
+            sm.send_mail(",".join(emails_list), alert_title, alert_comment)
 
             # 严重警告发短信
             if labels.get('severity') == "严重":
-                if not configs.get('sign_name') or not  configs.get('template_code'):
+                if not configs.get('sign_name') or not configs.get('template_code'):
                     sm.send_mail(configs.get('default_email'), alert_name, '请配置短信的sign_name和template_code')
                 else:
                     phone_numbers = redis_conn.hkeys(alert_name)
                     # 发送内容
-                    params = {"msg": alerts_data['annotations']['detail']}
+                    params = {"msg": alert_comment}
                     sms = SendSms(config_info.get(const.SMS_REGION), config_info.get(const.SMS_DOMAIN),
                                   config_info.get(const.SMS_PRODUCT_NAME), config_info.get(const.SMS_ACCESS_KEY_ID),
                                   config_info.get(const.SMS_ACCESS_KEY_SECRET))
