@@ -17,7 +17,7 @@ from biz.handlers.paid_mg_handler import paid_urls
 # from biz.tail_data import tail_data
 from biz.handlers.password_handler import password_urls
 from biz.handlers.mycrypt_handler import mycrypt_urls
-
+from biz.handlers.zabbix_mg_handler import zabbix_urls
 
 class Application(myApplication):
     def __init__(self, **settings):
@@ -29,7 +29,7 @@ class Application(myApplication):
         urls.extend(paid_urls)
         urls.extend(password_urls)
         urls.extend(mycrypt_urls)
-
+        urls.extend(zabbix_urls)
         # Application 放一些定时任务 ，可能会导致阻塞， 放到了crontab_app里面，单独起
         # tailed_callback = tornado.ioloop.PeriodicCallback(tail_data, 3600000)  # 一小时执行一次
         # tailed_callback.start()

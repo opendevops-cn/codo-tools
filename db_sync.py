@@ -12,6 +12,7 @@ from models.fault_mg import Base as falut_base
 from models.project_mg import Base as project_base
 from models.event_record import Base as event_record_base
 from models.paid_mg import Base as paid_base
+from models.zabbix_mg import Base as zabbix_base
 from websdk.consts import const
 from settings import settings as app_settings
 # ORM创建表结构
@@ -33,6 +34,7 @@ def create():
     project_base.metadata.create_all(engine)
     event_record_base.metadata.create_all(engine)
     paid_base.metadata.create_all(engine)
+    zabbix_base.metadata.create_all(engine)
     print('[Success] 表结构创建成功!')
 
 
@@ -42,6 +44,7 @@ def drop():
     project_base.metadata.drop_all(engine)
     event_record_base.metadata.drop_all(engine)
     paid_base.metadata.drop_all(engine)
+    zabbix_base.metadata.drop_all(engine)
 
 
 if __name__ == '__main__':

@@ -18,8 +18,8 @@ class PrometheusAlert(Base):
     __tablename__ = 'prometheus_alert'  # prometheus alertmanager告警
     # 项目表结构
     id = Column(Integer, primary_key=True, autoincrement=True)  # ID
-    nicknames = Column('nicknames',String(500))  # 姓名
-    keyword = Column(String(300),unique=True, nullable=False)  # 关键字
+    nicknames = Column('nicknames',String(200))  # 姓名
+    keyword = Column(String(255),unique=True, nullable=False)  # 关键字
     alert_level = Column('alert_level', String(10))  # 级别
     config_file = Column('config_file',Text())  # 配置文件
     create_at = Column('create_at',DateTime(), default=datetime.now)  # 记录创建时间
