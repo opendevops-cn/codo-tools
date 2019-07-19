@@ -8,7 +8,6 @@
 
 import json
 import datetime
-import requests
 from tornado import gen
 from tornado import httpclient
 from concurrent.futures import ThreadPoolExecutor
@@ -106,12 +105,14 @@ class ZabbixHostsHandler(tornado.web.RequestHandler):
 
     def put(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
+        print('data--->',data)
         alert_title = data.get('alert_title').strip()
         temp_id = data.get('temp_id')
         schedule = data.get('schedule', 'new')
         hook_args = data.get('hook_args')
         the_id = data.get('the_id')
-        if not alert_title or not temp_id or not the_id:
+        exec_host = data.get('exec_host', '127.0.0.1')
+        if not alert_title or not temp_id or not the_id or not exec_host:
             return self.write(dict(code=1, msg='关键参数不能为空'))
 
         if hook_args:
@@ -132,9 +133,9 @@ class ZabbixHostsHandler(tornado.web.RequestHandler):
                     return self.write(dict(code=2, msg='钩子参数转化为字典的时候出错，请仔细检查相关内容' + str(e)))
 
             if not hook_dict:
-                hook_dict = {alert_title: dict(temp_id=temp_id, schedule=schedule, hook_args=hook_args_dict)}
+                hook_dict = {alert_title: dict(exec_host=exec_host,temp_id=temp_id, schedule=schedule, hook_args=hook_args_dict)}
             else:
-                hook_dict[alert_title] = dict(temp_id=temp_id, schedule=schedule, hook_args=hook_args_dict)
+                hook_dict[alert_title] = dict(exec_host=exec_host,temp_id=temp_id, schedule=schedule, hook_args=hook_args_dict)
 
             hook_dict = json.dumps(hook_dict)
 
@@ -369,6 +370,8 @@ class ZabbixHookHandler(BaseHandler):
 
     async def post(self, *args, **kwargs):
         data = json.loads(self.request.body.decode("utf-8"))
+
+        print('data----->',data)
         ins_log.read_log('info', '接收到数据：{}'.format(data))
         zabbix_url = data.get('zabbix_url')
         messages = data.get('messages')
@@ -442,16 +445,21 @@ class ZabbixHookHandler(BaseHandler):
             else:
                 # 开始提交任务到平台
                 the_hook = hook_dict[alert_title_mate]
-
-                hook_args = dict(HOSTIP=host_ip, HOSTNAME=host_name, TAGGER_NAME=tagger_name,
+                print(the_hook)
+                hook_args = dict(ZABBIX_URL=zabbix_url,HOSTIP=host_ip, HOSTNAME=host_name, TAGGER_NAME=tagger_name,
                                  TAGGER_STATUS=tagger_status, TAGGER_LEVEL=tagger_level)
-                old_hook_args = the_hook.get('hook_args')
+                # old_hook_args = the_hook.get('hook_args')
                 ### 参数字典
-                hosts_dict = {1: "127.0.0.1", 2: "127.0.0.1"}  ### 主机字典
-                if the_hook.get('hook_args'):
-                    hosts_dict.update(the_hook.get('hook_args'))
-                    if old_hook_args.get('hosts_dict') and isinstance(old_hook_args.get('hosts_dict'), dict):
-                        hosts_dict = old_hook_args.pop('hosts_dict')
+                # hosts_dict = {1: "127.0.0.1", 2: "127.0.0.1"}  ### 主机字典
+                # if the_hook.get('hook_args'):
+                #     hosts_dict.update(the_hook.get('hook_args'))
+                exec_host = the_hook.get('exec_host')
+                if exec_host:
+                    hosts_dict = {1: exec_host}
+                else:
+                    hosts_dict = {1: "127.0.0.1", 2: "127.0.0.1"}  ### 主机字典
+                    # if old_hook_args.get('hosts_dict') and isinstance(old_hook_args.get('hosts_dict'), dict):
+                    #     hosts_dict = old_hook_args.pop('hosts_dict')
 
                 msg = '匹配到钩子：{} 模板ID：{} 执行：{}，参数：{}'.format(alert_title_mate, the_hook.get('temp_id'),
                                                             the_hook.get('schedule'), str(the_hook.get('hook_args')))
@@ -463,15 +471,15 @@ class ZabbixHookHandler(BaseHandler):
                 session.add(ZabbixHookLog(zabbix_url=zabbix_url, logs_info=msg))
 
         data_info = dict(exec_time=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                         task_name='ZABBIX钩子任务',
-                         temp_id=the_hook.get('temp_id'),
+                         task_name='ZABBIX钩子任务', temp_id=the_hook.get('temp_id'),
                          schedule=the_hook.get('schedule', 'ready'),
                          submitter=self.get_current_nickname(), args=str(hook_args), hosts=str(hosts_dict))
 
         with DBContext('w', None, True) as session:
             task_conf = session.query(ZabbixSubmitTaskConf.task_url, ZabbixSubmitTaskConf.auth_key).first()
-            task_url = task_conf[0]
-            auth_key = task_conf[1]
+
+        task_url = task_conf[0]
+        auth_key = task_conf[1]
 
         http_client = httpclient.AsyncHTTPClient()
         cookie = {"Cookie": 'auth_key={}'.format(auth_key)}
