@@ -207,7 +207,7 @@ class GetBucketInfoHandler(BaseHandler):
         if cache_config_info:
             config_info = convert(cache_config_info)
 
-            if not config_info['STORAGE_REGION'] and not config_info['STORAGE_REGION']:
+            if not config_info.get('STORAGE_REGION') and not config_info.get('STORAGE_REGION'):
                 return self.write(dict(code=-1, msg='没有发现OSS配置信息'))
 
             oss_info = {

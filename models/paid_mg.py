@@ -21,6 +21,6 @@ class PaidMG(Base):
     paid_start_time = Column(DateTime, nullable=False)  # 上次付费时间
     paid_end_time = Column(DateTime, nullable=False)  # 到期时间
     reminder_day = Column(Integer, nullable=False)  # 提前多少天提醒
-    nicknames = Column(String(500), nullable=True) #提醒人员
+    nicknames = Column(String(200), nullable=True) #提醒人员
     create_at = Column(DateTime, nullable=False, default=datetime.now())  # 记录创建时间
     update_at = Column(TIMESTAMP, nullable=False, default=datetime.now())  # 记录更新时间
