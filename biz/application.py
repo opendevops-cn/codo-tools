@@ -14,10 +14,10 @@ from biz.handlers.fault_mg_handler import fault_urls
 from biz.handlers.project_mg_handler import project_urls
 from biz.handlers.event_mg_handler import event_urls
 from biz.handlers.paid_mg_handler import paid_urls
-# from biz.tail_data import tail_data
 from biz.handlers.password_handler import password_urls
 from biz.handlers.mycrypt_handler import mycrypt_urls
 from biz.handlers.zabbix_mg_handler import zabbix_urls
+from biz.handlers.ops_tools_handler import ops_tools_url
 
 class Application(myApplication):
     def __init__(self, **settings):
@@ -30,9 +30,7 @@ class Application(myApplication):
         urls.extend(password_urls)
         urls.extend(mycrypt_urls)
         urls.extend(zabbix_urls)
-        # Application 放一些定时任务 ，可能会导致阻塞， 放到了crontab_app里面，单独起
-        # tailed_callback = tornado.ioloop.PeriodicCallback(tail_data, 3600000)  # 一小时执行一次
-        # tailed_callback.start()
+        urls.extend(ops_tools_url)
         super(Application, self).__init__(urls, **settings)
 
 
