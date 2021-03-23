@@ -25,7 +25,8 @@ class BaseHandler(SDKBaseHandler):
             raise HTTPError(401, 'auth failed 1')
 
         else:
-            user_info = jwt.decode(auth_key, verify=False).get('data')
+            #user_info = jwt.decode(auth_key, verify=False).get('data')
+            user_info = jwt.decode(auth_key, options={"verify_signature": False}).get('data')
             self.user_id = user_info.get('user_id', None)
             self.username = user_info.get('username', None)
             self.nickname = user_info.get('nickname', None)
